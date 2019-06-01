@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
 
     DatabaseHelper dbHelper;
     EditText usernameText, passwordText, chatIdText;
-    Button createUserButton, createChatButton, loginButton;
+    Button createUserButton, createChatButton, joinChatButton, loginButton;
     User user;
 
     @Override
@@ -34,11 +34,13 @@ public class MainActivity extends AppCompatActivity {
         chatIdText = (EditText)findViewById(R.id.editText_chat_id);
         createUserButton = (Button)findViewById(R.id.button_createAccount);
         createChatButton = (Button)findViewById(R.id.button_createChat);
+        joinChatButton = (Button)findViewById(R.id.button_joinChat);
         loginButton = (Button)findViewById(R.id.button_join);
 
         //set behaviors of interface components
         CreateAccount();
         CreateChat();
+        JoinChat();
         Login();
     }
 
@@ -95,6 +97,39 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
     }
+
+    //defines behavior of 'Create Chat' button
+    public void JoinChat(){
+        joinChatButton.setOnClickListener(
+                new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        //remove this if statement in the future
+                        if(user == null) {
+                            Toast.makeText(MainActivity.this, "Need to login first", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        String username = user.getUserName();
+                        String chatId = chatIdText.getText().toString();
+
+                        //check whether chat exists
+                        boolean isExistingChat = dbHelper.isExistingChat(chatId);
+
+                        if(isExistingChat == true){
+                            //attempt to insert new entry to Chat_User database table
+                            dbHelper.insertChatUser(username, chatId);
+                            //add new chat to user's chats array
+                            ArrayList<Chat> chats  = user.getChats();
+                            chats.add(new Chat(chatId));
+                            Toast.makeText(MainActivity.this, "Joined Chat Successful", Toast.LENGTH_LONG).show();
+                        } else{
+                            Toast.makeText(MainActivity.this, "Joined Chat Unsuccessful", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+        );
+    }
+
 
     //defines behavior of 'Login' button
     public void Login(){

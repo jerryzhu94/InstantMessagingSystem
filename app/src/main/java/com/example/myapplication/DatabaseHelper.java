@@ -49,10 +49,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //inserts new chat tuple into Chat table
-    public boolean insertChat(String chat_id){
+    public boolean insertChat(String chatId){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COL1_Chat, chat_id);
+        contentValues.put(COL1_Chat, chatId);
 
         //insert data into table
         long result = db.insert(TABLE_Chat, null, contentValues);
@@ -64,11 +64,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //inserts new chat user tuple into Chat_User Table
-    public boolean insertChatUser(String username,String chat_id){
+    public boolean insertChatUser(String username,String chatId){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL1_User, username);
-        contentValues.put(COL1_Chat, chat_id);
+        contentValues.put(COL1_Chat, chatId);
 
         //insert data into table
         long result = db.insert(TABLE_Chat_User, null, contentValues);
@@ -85,6 +85,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String selectUserQuery =    "SELECT * FROM " + TABLE_User +
                                     " WHERE " + COL1_User + " = '" + username +
                                     "' AND " + COL2_User + " = '" + password + "'";
+
+
+        Cursor cursor = db.rawQuery(selectUserQuery, null);
+        boolean exists = (cursor.getCount() > 0);
+        cursor.close();
+        return exists;
+    }
+
+    //returns true if such tuple in Chat table exists
+    public boolean isExistingChat(String chatId){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selectUserQuery =    "SELECT * FROM " + TABLE_Chat +
+                " WHERE " + COL1_Chat + " = '" + chatId + "'";
 
 
         Cursor cursor = db.rawQuery(selectUserQuery, null);
